@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { motion } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
+import Link from "next/link";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,24 +29,24 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <a
-                href="#"
+              <Link
+                href="/"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out font-inter"
               >
                 Anasayfa
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/hakkimda"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out"
               >
                 Hakkımda
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/iletisim"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out"
               >
                 İletişim
-              </a>
+              </Link>
               <Button>Randevu Al</Button>
             </div>
           </div>
@@ -78,24 +79,24 @@ const Navbar = () => {
             id="mobile-menu"
           >
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3  mt-2">
-              <a
-                href="#"
+              <Link
+                href="/"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors duration-200 ease-in-out"
               >
                 Anasayfa
-              </a>
-              <a
+              </Link>
+              <Link
                 href="#"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors duration-200 ease-in-out"
               >
                 Hakkımda
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/iletisim"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors duration-200 ease-in-out"
               >
                 İletişim
-              </a>
+              </Link>
               <Button fullWidth>
                 <a href="/randevu-al">Randevu Al</a>
               </Button>
