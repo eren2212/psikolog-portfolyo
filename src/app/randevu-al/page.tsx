@@ -6,8 +6,9 @@ import Button from "../components/Button";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { supabase, Appointment } from "@/lib/supabase";
+import { supabase, Appointment, BlockedPeriod } from "@/lib/supabase";
 import { FaCalendarAlt, FaClock, FaUser } from "react-icons/fa";
+import { useToast } from "../components/Toast";
 
 // Moment.js yerelleştirme
 moment.locale("tr");
@@ -19,11 +20,14 @@ const RandevuAlPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const toast = useToast();
   const [calendarLoading, setCalendarLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentView, setCurrentView] = useState<
     "month" | "week" | "day" | "agenda" | "work_week"
   >("month");
+  const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -44,10 +48,25 @@ const RandevuAlPage = () => {
     "16:00-17:00",
   ];
 
-  // Randevuları yükle
+  // Randevuları ve bloke dönemleri yükle
   useEffect(() => {
     fetchAppointments();
+    fetchBlockedPeriods();
   }, []);
+
+  const fetchBlockedPeriods = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blocked_periods")
+        .select("*")
+        .order("start_date", { ascending: true });
+
+      if (error) throw error;
+      setBlockedPeriods(data || []);
+    } catch (error) {
+      console.error("Bloke dönemler yüklenirken hata:", error);
+    }
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -92,13 +111,40 @@ const RandevuAlPage = () => {
 
     // Geçmiş tarihleri seçmeyi engelle
     if (selectedDay.isBefore(today)) {
-      alert("Geçmiş tarihler için randevu alınamaz.");
+      toast.showWarning(
+        "Geçmiş Tarih",
+        "Geçmiş tarihler için randevu alınamaz."
+      );
       return;
     }
 
     // Hafta sonu kontrolü (Cumartesi: 6, Pazar: 0)
     if (start.getDay() === 0 || start.getDay() === 6) {
-      alert("Hafta sonları randevu alınamaz.");
+      toast.showWarning("Hafta Sonu", "Hafta sonları randevu alınamaz.");
+      return;
+    }
+
+    // Bloke edilen dönemler kontrolü
+    const selectedDateStr = selectedDay.format("YYYY-MM-DD");
+    const isBlocked = blockedPeriods.some((period) => {
+      const startDate = moment(period.start_date);
+      const endDate = moment(period.end_date);
+      return selectedDay.isBetween(startDate, endDate, "day", "[]");
+    });
+
+    if (isBlocked) {
+      const blockedPeriod = blockedPeriods.find((period) => {
+        const startDate = moment(period.start_date);
+        const endDate = moment(period.end_date);
+        return selectedDay.isBetween(startDate, endDate, "day", "[]");
+      });
+
+      const reasonText =
+        blockedPeriod?.reason || "Bu tarih aralığı müsait değil";
+      toast.showWarning(
+        "Tarih Müsait Değil",
+        `Bu tarih için randevu alınamaz. ${reasonText}`
+      );
       return;
     }
 
@@ -120,7 +166,10 @@ const RandevuAlPage = () => {
       const slotStartTime = moment(`${dateStr} ${timeSlot.split("-")[0]}`);
 
       if (slotStartTime.isBefore(currentTime)) {
-        alert("Geçmiş saatler için randevu alınamaz!");
+        toast.showWarning(
+          "Geçmiş Saat",
+          "Geçmiş saatler için randevu alınamaz!"
+        );
         return;
       }
     }
@@ -131,7 +180,7 @@ const RandevuAlPage = () => {
     );
 
     if (existingAppointment) {
-      alert("Bu saat dilimi zaten dolu!");
+      toast.showWarning("Saat Dolu", "Bu saat dilimi zaten dolu!");
       return;
     }
 
@@ -162,8 +211,9 @@ const RandevuAlPage = () => {
 
       if (error) throw error;
 
-      alert(
-        "Randevunuz başarıyla oluşturuldu! En kısa sürede size dönüş yapılacaktır."
+      toast.showSuccess(
+        "Randevu Talebiniz Oluşturuldu!",
+        "Randevunuz talebiniz başarıyla oluşturuldu! En kısa sürede size dönüş yapılacaktır."
       );
 
       // Formu temizle
@@ -176,7 +226,10 @@ const RandevuAlPage = () => {
       fetchAppointments();
     } catch (error) {
       console.error("Randevu oluşturulurken hata:", error);
-      alert("Randevu oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+      toast.showError(
+        "Hata!",
+        "Randevu oluşturulurken bir hata oluştu. Lütfen tekrar deneyin."
+      );
     } finally {
       setLoading(false);
     }

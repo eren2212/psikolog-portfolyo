@@ -37,6 +37,16 @@ export interface Appointment {
   time_slot: string;
   status: "pending" | "confirmed" | "cancelled";
   message?: string;
+  created_by_admin?: boolean;
+  created_at: string;
+}
+
+export interface BlockedPeriod {
+  id: string;
+  start_date: string;
+  end_date: string;
+  reason?: string;
+  block_type: "holiday" | "meeting" | "personal" | "unavailable";
   created_at: string;
 }
 

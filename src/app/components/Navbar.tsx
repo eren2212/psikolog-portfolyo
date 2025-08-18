@@ -15,15 +15,17 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Image
-                src="/psikolog_images/logo.png"
-                alt="logo"
-                width={150}
-                height={150}
-                className="py-2"
-              />
-            </div>
+            <Link href="/">
+              <div className="flex-shrink-0">
+                <Image
+                  src="/psikolog_images/logo.png"
+                  alt="logo"
+                  width={150}
+                  height={150}
+                  className="py-2"
+                />
+              </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
