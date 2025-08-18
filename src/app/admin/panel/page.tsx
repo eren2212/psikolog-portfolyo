@@ -25,11 +25,21 @@ const localizer = momentLocalizer(moment);
 
 const AdminPanelPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    Appointment[]
+  >([]);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "pending" | "confirmed" | "cancelled"
+  >("all");
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState<
+    "month" | "week" | "day" | "agenda" | "work_week"
+  >("month");
 
   const router = useRouter();
 
@@ -42,8 +52,22 @@ const AdminPanelPage = () => {
 
       if (error) throw error;
       setAppointments(data || []);
+      setFilteredAppointments(data || []);
     } catch (error) {
       console.error("Randevular yüklenirken hata:", error);
+    }
+  };
+
+  // Filtreleme fonksiyonu
+  const filterAppointments = (
+    status: "all" | "pending" | "confirmed" | "cancelled"
+  ) => {
+    setActiveFilter(status);
+    if (status === "all") {
+      setFilteredAppointments(appointments);
+    } else {
+      const filtered = appointments.filter((apt) => apt.status === status);
+      setFilteredAppointments(filtered);
     }
   };
 
@@ -100,6 +124,11 @@ const AdminPanelPage = () => {
       await fetchAppointments();
       setSelectedAppointment(null);
 
+      // Aktif filtreyi tekrar uygula
+      setTimeout(() => {
+        filterAppointments(activeFilter);
+      }, 100);
+
       const statusText =
         newStatus === "confirmed" ? "onaylandı" : "iptal edildi";
       alert(`Randevu başarıyla ${statusText}!`);
@@ -111,8 +140,8 @@ const AdminPanelPage = () => {
     }
   };
 
-  // Takvim için event'leri hazırla
-  const calendarEvents = appointments.map((appointment) => ({
+  // Takvim için event'leri hazırla (filtrelenmiş)
+  const calendarEvents = filteredAppointments.map((appointment) => ({
     id: appointment.id,
     title: `${appointment.time_slot} - ${appointment.name}`,
     start: moment(
@@ -201,7 +230,10 @@ const AdminPanelPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className={`bg-white rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              activeFilter === "all" ? "ring-2 ring-blue-500" : ""
+            }`}
+            onClick={() => filterAppointments("all")}
           >
             <div className="flex items-center">
               <div className="p-3 bg-blue-50 rounded-lg">
@@ -222,7 +254,10 @@ const AdminPanelPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className={`bg-white rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              activeFilter === "pending" ? "ring-2 ring-yellow-500" : ""
+            }`}
+            onClick={() => filterAppointments("pending")}
           >
             <div className="flex items-center">
               <div className="p-3 bg-yellow-50 rounded-lg">
@@ -241,7 +276,10 @@ const AdminPanelPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className={`bg-white rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              activeFilter === "confirmed" ? "ring-2 ring-green-500" : ""
+            }`}
+            onClick={() => filterAppointments("confirmed")}
           >
             <div className="flex items-center">
               <div className="p-3 bg-green-50 rounded-lg">
@@ -260,7 +298,10 @@ const AdminPanelPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className={`bg-white rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              activeFilter === "cancelled" ? "ring-2 ring-red-500" : ""
+            }`}
+            onClick={() => filterAppointments("cancelled")}
           >
             <div className="flex items-center">
               <div className="p-3 bg-red-50 rounded-lg">
@@ -287,10 +328,23 @@ const AdminPanelPage = () => {
             className="lg:col-span-2"
           >
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                <FaCalendarAlt className="mr-3 text-purple-600" />
-                Randevu Takvimi
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                  <FaCalendarAlt className="mr-3 text-purple-600" />
+                  Randevu Takvimi
+                </h2>
+                <div className="text-sm text-gray-600">
+                  {activeFilter === "all" && "Tüm Randevular"}
+                  {activeFilter === "pending" && "Bekleyen Randevular"}
+                  {activeFilter === "confirmed" && "Onaylanan Randevular"}
+                  {activeFilter === "cancelled" && "İptal Edilen Randevular"}
+                  {filteredAppointments.length > 0 && (
+                    <span className="ml-2 text-purple-600 font-medium">
+                      ({filteredAppointments.length} randevu)
+                    </span>
+                  )}
+                </div>
+              </div>
 
               <div className="calendar-container" style={{ height: "600px" }}>
                 <Calendar
@@ -303,6 +357,14 @@ const AdminPanelPage = () => {
                   eventPropGetter={eventStyleGetter}
                   popup={true}
                   popupOffset={{ x: 10, y: 10 }}
+                  views={["month", "week", "day", "agenda"]}
+                  view={currentView}
+                  onView={(view) => setCurrentView(view)}
+                  date={currentDate}
+                  onNavigate={(date) => setCurrentDate(date)}
+                  step={60}
+                  showMultiDayTimes
+                  toolbar={true}
                   messages={{
                     next: "Sonraki",
                     previous: "Önceki",
@@ -310,7 +372,14 @@ const AdminPanelPage = () => {
                     month: "Ay",
                     week: "Hafta",
                     day: "Gün",
+                    agenda: "Ajanda",
                     showMore: (total) => `+${total} randevu daha`,
+                    date: "Tarih",
+                    time: "Saat",
+                    event: "Randevu",
+                    noEventsInRange: "Bu tarih aralığında randevu yok.",
+                    allDay: "Tüm Gün",
+                    work_week: "İş Haftası",
                   }}
                 />
               </div>

@@ -19,6 +19,11 @@ const RandevuAlPage = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [calendarLoading, setCalendarLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState<
+    "month" | "week" | "day" | "agenda" | "work_week"
+  >("month");
 
   // Form state
   const [formData, setFormData] = useState({
@@ -46,6 +51,7 @@ const RandevuAlPage = () => {
 
   const fetchAppointments = async () => {
     try {
+      setCalendarLoading(true);
       const { data, error } = await supabase
         .from("appointments")
         .select("*")
@@ -56,6 +62,11 @@ const RandevuAlPage = () => {
       setAppointments(data || []);
     } catch (error) {
       console.error("Randevular yüklenirken hata:", error);
+    } finally {
+      // Kısa bir gecikme ekleyerek takvimin render olmasını bekle
+      setTimeout(() => {
+        setCalendarLoading(false);
+      }, 500);
     }
   };
 
@@ -226,24 +237,39 @@ const RandevuAlPage = () => {
               </h2>
 
               <div className="calendar-container" style={{ height: "500px" }}>
-                <Calendar
-                  localizer={localizer}
-                  events={calendarEvents}
-                  startAccessor="start"
-                  endAccessor="end"
-                  style={{ height: "100%" }}
-                  onSelectSlot={handleSelectSlot}
-                  selectable
-                  eventPropGetter={eventStyleGetter}
-                  messages={{
-                    next: "Sonraki",
-                    previous: "Önceki",
-                    today: "Bugün",
-                    month: "Ay",
-                    week: "Hafta",
-                    day: "Gün",
-                  }}
-                />
+                {calendarLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                      <p className="text-gray-600">Takvim yükleniyor...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <Calendar
+                    localizer={localizer}
+                    events={calendarEvents}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: "100%" }}
+                    onSelectSlot={handleSelectSlot}
+                    selectable
+                    eventPropGetter={eventStyleGetter}
+                    views={["month", "week", "day"]}
+                    view={currentView}
+                    onView={(view) => setCurrentView(view)}
+                    date={currentDate}
+                    onNavigate={(date) => setCurrentDate(date)}
+                    toolbar={true}
+                    messages={{
+                      next: "Sonraki",
+                      previous: "Önceki",
+                      today: "Bugün",
+                      month: "Ay",
+                      week: "Hafta",
+                      day: "Gün",
+                    }}
+                  />
+                )}
               </div>
 
               {/* Renk açıklaması */}
