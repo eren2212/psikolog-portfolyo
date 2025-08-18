@@ -17,8 +17,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Psikolog Portfolyo",
-  description: "Modern ve profesyonel psikolog portfolyo sitesi",
+  title: "PSK Fatih İridere",
+  description: "PSK Fatih İridere",
 };
 
 export default function RootLayout({
