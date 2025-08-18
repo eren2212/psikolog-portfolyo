@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Container from "../Container";
+import Link from "next/link";
 
 const ProfessionalField = () => {
   const services = [
@@ -135,7 +136,7 @@ const ProfessionalField = () => {
                   viewport={{ once: true }}
                   whileHover={{ x: 5 }}
                 >
-                  <span>Detayları İncele</span>
+                  <Link href={service.link}>Detayları İncele</Link>
                   <motion.svg
                     className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200"
                     fill="none"
