@@ -56,35 +56,65 @@ const HowFeeling = () => {
   useEffect(() => {
     if (!isBreathing) return;
 
+    let timeoutId: NodeJS.Timeout;
+    let isMounted = true;
+
     const runBreathingCycle = async () => {
-      while (isBreathing) {
-        // Inhale phase (4 seconds)
-        setBreathingPhase("inhale");
-        await breathingControls.start({
-          scale: 1.3,
-          transition: { duration: 4, ease: "easeInOut" },
-        });
+      try {
+        while (isBreathing && isMounted) {
+          // Inhale phase (4 seconds)
+          setBreathingPhase("inhale");
+          if (isMounted) {
+            await breathingControls.start({
+              scale: 1.3,
+              transition: { duration: 4, ease: "easeInOut" },
+            });
+          }
 
-        // Hold phase (1 second)
-        setBreathingPhase("hold");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Hold phase (1 second)
+          if (isMounted) {
+            setBreathingPhase("hold");
+            await new Promise((resolve) => {
+              timeoutId = setTimeout(resolve, 1000);
+            });
+          }
 
-        // Exhale phase (4 seconds)
-        setBreathingPhase("exhale");
-        await breathingControls.start({
-          scale: 1,
-          transition: { duration: 4, ease: "easeInOut" },
-        });
+          // Exhale phase (4 seconds)
+          if (isMounted) {
+            setBreathingPhase("exhale");
+            await breathingControls.start({
+              scale: 1,
+              transition: { duration: 4, ease: "easeInOut" },
+            });
+          }
 
-        // Hold phase (1 second)
-        setBreathingPhase("hold");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+          // Hold phase (1 second)
+          if (isMounted) {
+            setBreathingPhase("hold");
+            await new Promise((resolve) => {
+              timeoutId = setTimeout(resolve, 1000);
+            });
+          }
+        }
+      } catch (error) {
+        // Handle animation errors gracefully
+        console.log("Breathing animation stopped");
       }
     };
 
-    runBreathingCycle();
+    // Start the breathing cycle with a small delay to ensure component is mounted
+    timeoutId = setTimeout(() => {
+      if (isMounted) {
+        runBreathingCycle();
+      }
+    }, 100);
 
-    return () => setIsBreathing(false);
+    return () => {
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [breathingControls, isBreathing]);
 
   const breathingTexts = {
