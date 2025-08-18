@@ -5,11 +5,17 @@ const Button = ({
   className = "",
   fullWidth = false,
   variant = "primary",
+  type = "button",
+  disabled = false,
+  onClick,
 }: {
   children: React.ReactNode;
   className?: string;
   fullWidth?: boolean;
   variant?: "primary" | "secondary";
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  onClick?: () => void;
 }) => {
   const baseClasses =
     "inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2";
@@ -23,9 +29,14 @@ const Button = ({
 
   return (
     <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
       className={`${baseClasses} ${
         variantClasses[variant]
-      } px-6 py-3 rounded-xl text-sm ${fullWidth ? "w-full" : ""} ${className}`}
+      } px-6 py-3 rounded-xl text-sm ${fullWidth ? "w-full" : ""} ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      } ${className}`}
     >
       {children}
     </button>
