@@ -171,7 +171,6 @@ const RandevuAlPage = () => {
     }
 
     // Bloke edilen dönemler kontrolü
-    const selectedDateStr = selectedDay.format("YYYY-MM-DD");
     const isBlocked = blockedPeriods.some((period) => {
       const startDate = moment(period.start_date);
       const endDate = moment(period.end_date);
