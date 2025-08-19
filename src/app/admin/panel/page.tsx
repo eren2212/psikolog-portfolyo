@@ -53,6 +53,52 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
 
+  // Validation errors state
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  // Validation functions
+  const validateName = (name: string) => {
+    if (!name.trim()) return "Ad soyad zorunludur";
+    if (name.trim().length < 2) return "Ad soyad en az 2 karakter olmalıdır";
+    if (!/^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/.test(name))
+      return "Ad soyad sadece harf içerebilir";
+    if (name.trim().split(" ").length < 2)
+      return "Lütfen ad ve soyadınızı giriniz";
+    return "";
+  };
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) return "E-posta zorunludur";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Geçerli bir e-posta adresi giriniz";
+    return "";
+  };
+
+  const validatePhone = (phone: string) => {
+    if (!phone.trim()) return "Telefon numarası zorunludur";
+    // Türkiye telefon numarası formatları: 05xx xxx xx xx veya +90 5xx xxx xx xx
+    const phoneRegex = /^(\+90\s?)?0?5\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
+    const cleanPhone = phone.replace(/\s/g, "");
+    if (!phoneRegex.test(cleanPhone)) {
+      return "Geçerli bir Türkiye telefon numarası giriniz (örn: 0532 123 45 67)";
+    }
+    return "";
+  };
+
+  // Handle input changes with validation
+  const handleInputChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+
+    // Clear error when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
   // Çalışma saatleri
   const timeSlots = [
     "09:00-10:00",
@@ -67,6 +113,28 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot || !formData.timeSlot) return;
+
+    // Validate all fields
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhone(formData.phone);
+
+    const newErrors = {
+      name: nameError,
+      email: emailError,
+      phone: phoneError,
+    };
+
+    setErrors(newErrors);
+
+    // If there are errors, don't submit
+    if (nameError || emailError || phoneError) {
+      toast.showWarning(
+        "Form Hatası",
+        "Lütfen tüm alanları doğru şekilde doldurun."
+      );
+      return;
+    }
 
     setLoading(true);
     try {
@@ -137,9 +205,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             </label>
             <select
               value={formData.timeSlot}
-              onChange={(e) =>
-                setFormData({ ...formData, timeSlot: e.target.value })
-              }
+              onChange={(e) => handleInputChange("timeSlot", e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             >
@@ -159,13 +225,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="text"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => handleInputChange("name", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.name
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Hasta adı soyadı"
             />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -175,13 +246,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => handleInputChange("email", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.email
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="ornek@email.com"
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -191,13 +267,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              onChange={(e) => handleInputChange("phone", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="0555 123 45 67"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.phone
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
+              placeholder="0532 123 45 67"
             />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
           </div>
 
           <div>
@@ -206,9 +287,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             </label>
             <textarea
               value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
+              onChange={(e) => handleInputChange("message", e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
               placeholder="Ek bilgiler (isteğe bağlı)"

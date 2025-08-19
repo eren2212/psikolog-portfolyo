@@ -37,6 +37,52 @@ const RandevuAlPage = () => {
     message: "",
   });
 
+  // Validation errors state
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  // Validation functions
+  const validateName = (name: string) => {
+    if (!name.trim()) return "Ad soyad zorunludur";
+    if (name.trim().length < 2) return "Ad soyad en az 2 karakter olmalıdır";
+    if (!/^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/.test(name))
+      return "Ad soyad sadece harf içerebilir";
+    if (name.trim().split(" ").length < 2)
+      return "Lütfen ad ve soyadınızı giriniz";
+    return "";
+  };
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) return "E-posta zorunludur";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Geçerli bir e-posta adresi giriniz";
+    return "";
+  };
+
+  const validatePhone = (phone: string) => {
+    if (!phone.trim()) return "Telefon numarası zorunludur";
+    // Türkiye telefon numarası formatları: 05xx xxx xx xx veya +90 5xx xxx xx xx
+    const phoneRegex = /^(\+90\s?)?0?5\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
+    const cleanPhone = phone.replace(/\s/g, "");
+    if (!phoneRegex.test(cleanPhone)) {
+      return "Geçerli bir Türkiye telefon numarası giriniz (örn: 0532 123 45 67)";
+    }
+    return "";
+  };
+
+  // Handle input changes with validation
+  const handleInputChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+
+    // Clear error when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
   // Çalışma saatleri (09:00 - 17:00 arası)
   const timeSlots = [
     "09:00-10:00",
@@ -193,6 +239,28 @@ const RandevuAlPage = () => {
     e.preventDefault();
     if (!selectedDate || !selectedTimeSlot) return;
 
+    // Validate all fields
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhone(formData.phone);
+
+    const newErrors = {
+      name: nameError,
+      email: emailError,
+      phone: phoneError,
+    };
+
+    setErrors(newErrors);
+
+    // If there are errors, don't submit
+    if (nameError || emailError || phoneError) {
+      toast.showWarning(
+        "Form Hatası",
+        "Lütfen tüm alanları doğru şekilde doldurun."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const appointmentData = {
@@ -218,6 +286,7 @@ const RandevuAlPage = () => {
 
       // Formu temizle
       setFormData({ name: "", email: "", phone: "", message: "" });
+      setErrors({ name: "", email: "", phone: "" });
       setSelectedDate(null);
       setSelectedTimeSlot("");
       setShowForm(false);
@@ -430,11 +499,18 @@ const RandevuAlPage = () => {
                       required
                       value={formData.name}
                       onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
+                        handleInputChange("name", e.target.value)
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                        errors.name
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-purple-500"
+                      }`}
                       placeholder="Adınız ve soyadınız"
                     />
+                    {errors.name && (
+                      <p className="mt-2 text-sm text-red-600">{errors.name}</p>
+                    )}
                   </div>
 
                   <div>
@@ -446,11 +522,20 @@ const RandevuAlPage = () => {
                       required
                       value={formData.email}
                       onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
+                        handleInputChange("email", e.target.value)
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                        errors.email
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-purple-500"
+                      }`}
                       placeholder="ornek@email.com"
                     />
+                    {errors.email && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -462,11 +547,20 @@ const RandevuAlPage = () => {
                       required
                       value={formData.phone}
                       onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
+                        handleInputChange("phone", e.target.value)
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="0555 123 45 67"
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                        errors.phone
+                          ? "border-red-300 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-purple-500"
+                      }`}
+                      placeholder="0532 123 45 67"
                     />
+                    {errors.phone && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.phone}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -477,7 +571,7 @@ const RandevuAlPage = () => {
                       rows={3}
                       value={formData.message}
                       onChange={(e) =>
-                        setFormData({ ...formData, message: e.target.value })
+                        handleInputChange("message", e.target.value)
                       }
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Randevu hakkında belirtmek istediğiniz özel durumlar..."
