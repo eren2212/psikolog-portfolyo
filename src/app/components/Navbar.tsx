@@ -49,8 +49,11 @@ const Navbar = () => {
               >
                 İletişim
               </Link>
-              <Link href="/randevu-al">
-                <Button className="cursor-pointer">Randevu Al</Button>
+              <Link
+                href="/randevu-al"
+                className="inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500 px-6 py-3 rounded-xl text-sm cursor-pointer"
+              >
+                Randevu Al
               </Link>
             </div>
           </div>
@@ -101,10 +104,11 @@ const Navbar = () => {
               >
                 İletişim
               </Link>
-              <Link href="/randevu-al">
-                <Button fullWidth className="cursor-pointer">
-                  <Link href="/randevu-al">Randevu Al</Link>
-                </Button>
+              <Link
+                href="/randevu-al"
+                className="w-full inline-flex items-center justify-center font-medium transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500 px-6 py-3 rounded-xl text-sm cursor-pointer"
+              >
+                Randevu Al
               </Link>
             </div>
           </motion.div>
