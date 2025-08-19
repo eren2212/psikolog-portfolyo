@@ -24,18 +24,108 @@ import {
   FaPhone,
   FaEnvelope,
   FaComment,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 
 // Moment.js yerelleştirme
 moment.locale("tr");
 const localizer = momentLocalizer(moment);
 
+// Modern Confirm Dialog Component
+interface ConfirmDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  type?: "danger" | "warning" | "info";
+}
+
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Onayla",
+  cancelText = "İptal",
+  type = "danger",
+}) => {
+  if (!isOpen) return null;
+
+  const typeStyles = {
+    danger: {
+      icon: FaTimes,
+      iconBg: "bg-red-100",
+      iconColor: "text-red-600",
+      confirmBtn: "bg-red-600 hover:bg-red-700",
+    },
+    warning: {
+      icon: FaExclamationTriangle,
+      iconBg: "bg-yellow-100",
+      iconColor: "text-yellow-600",
+      confirmBtn: "bg-yellow-600 hover:bg-yellow-700",
+    },
+    info: {
+      icon: FaExclamationTriangle,
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+      confirmBtn: "bg-blue-600 hover:bg-blue-700",
+    },
+  };
+
+  const style = typeStyles[type];
+  const IconComponent = style.icon;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+      >
+        <div className="p-6">
+          <div className="flex items-center space-x-4 mb-4">
+            <div
+              className={`w-12 h-12 rounded-full ${style.iconBg} flex items-center justify-center flex-shrink-0`}
+            >
+              <IconComponent className={`w-6 h-6 ${style.iconColor}`} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{message}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 px-6 py-4 flex space-x-3">
+          <Button onClick={onClose} variant="secondary" className="flex-1">
+            {cancelText}
+          </Button>
+          <Button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className={`flex-1 text-white ${style.confirmBtn}`}
+          >
+            {confirmText}
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 // Manuel Randevu Oluşturma Modal Component
 interface CreateAppointmentModalProps {
   selectedSlot: { date: Date; timeSlot?: string } | null;
   onClose: () => void;
   onSuccess: () => void;
-  toast: any;
+  toast: ReturnType<typeof useToast>;
 }
 
 const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
@@ -53,6 +143,52 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
 
+  // Validation errors state
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  // Validation functions
+  const validateName = (name: string) => {
+    if (!name.trim()) return "Ad soyad zorunludur";
+    if (name.trim().length < 2) return "Ad soyad en az 2 karakter olmalıdır";
+    if (!/^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/.test(name))
+      return "Ad soyad sadece harf içerebilir";
+    if (name.trim().split(" ").length < 2)
+      return "Lütfen ad ve soyadınızı giriniz";
+    return "";
+  };
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) return "E-posta zorunludur";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Geçerli bir e-posta adresi giriniz";
+    return "";
+  };
+
+  const validatePhone = (phone: string) => {
+    if (!phone.trim()) return "Telefon numarası zorunludur";
+    // Türkiye telefon numarası formatları: 05xx xxx xx xx veya +90 5xx xxx xx xx
+    const phoneRegex = /^(\+90\s?)?0?5\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
+    const cleanPhone = phone.replace(/\s/g, "");
+    if (!phoneRegex.test(cleanPhone)) {
+      return "Geçerli bir Türkiye telefon numarası giriniz (örn: 0532 123 45 67)";
+    }
+    return "";
+  };
+
+  // Handle input changes with validation
+  const handleInputChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+
+    // Clear error when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
   // Çalışma saatleri
   const timeSlots = [
     "09:00-10:00",
@@ -67,6 +203,28 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot || !formData.timeSlot) return;
+
+    // Validate all fields
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhone(formData.phone);
+
+    const newErrors = {
+      name: nameError,
+      email: emailError,
+      phone: phoneError,
+    };
+
+    setErrors(newErrors);
+
+    // If there are errors, don't submit
+    if (nameError || emailError || phoneError) {
+      toast.showWarning(
+        "Form Hatası",
+        "Lütfen tüm alanları doğru şekilde doldurun."
+      );
+      return;
+    }
 
     setLoading(true);
     try {
@@ -137,9 +295,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             </label>
             <select
               value={formData.timeSlot}
-              onChange={(e) =>
-                setFormData({ ...formData, timeSlot: e.target.value })
-              }
+              onChange={(e) => handleInputChange("timeSlot", e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
             >
@@ -159,13 +315,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="text"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => handleInputChange("name", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.name
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Hasta adı soyadı"
             />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -175,13 +336,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => handleInputChange("email", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.email
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="ornek@email.com"
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -191,13 +357,18 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              onChange={(e) => handleInputChange("phone", e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              placeholder="0555 123 45 67"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                errors.phone
+                  ? "border-red-300 focus:ring-red-500"
+                  : "border-gray-300"
+              }`}
+              placeholder="0532 123 45 67"
             />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            )}
           </div>
 
           <div>
@@ -206,9 +377,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentModalProps> = ({
             </label>
             <textarea
               value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
+              onChange={(e) => handleInputChange("message", e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
               placeholder="Ek bilgiler (isteğe bağlı)"
@@ -239,7 +408,7 @@ interface BlockPeriodModalProps {
   onClose: () => void;
   onSuccess: () => void;
   blockedPeriods: BlockedPeriod[];
-  toast: any;
+  toast: ReturnType<typeof useToast>;
 }
 
 const BlockPeriodModal: React.FC<BlockPeriodModalProps> = ({
@@ -252,7 +421,7 @@ const BlockPeriodModal: React.FC<BlockPeriodModalProps> = ({
     startDate: "",
     endDate: "",
     reason: "",
-    blockType: "holiday" as const,
+    blockType: "holiday" as "holiday" | "meeting" | "personal" | "unavailable",
   });
   const [loading, setLoading] = useState(false);
 
@@ -391,7 +560,11 @@ const BlockPeriodModal: React.FC<BlockPeriodModalProps> = ({
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      blockType: e.target.value as any,
+                      blockType: e.target.value as
+                        | "holiday"
+                        | "meeting"
+                        | "personal"
+                        | "unavailable",
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
@@ -499,8 +672,22 @@ const AdminPanelPage = () => {
   } | null>(null);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    appointmentId: "",
+    action: "" as "cancel" | "",
+  });
 
   const router = useRouter();
+
+  // Randevunun geçmişte olup olmadığını kontrol et
+  const isPastAppointment = (appointment: Appointment) => {
+    const appointmentDateTime = moment(
+      `${appointment.date} ${appointment.time_slot.split("-")[1]}`
+    );
+    const now = moment();
+    return appointmentDateTime.isBefore(now);
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -585,6 +772,25 @@ const AdminPanelPage = () => {
     appointmentId: string,
     newStatus: "confirmed" | "cancelled"
   ) => {
+    // İptal işlemi için modern dialog göster
+    if (newStatus === "cancelled") {
+      setConfirmDialog({
+        isOpen: true,
+        appointmentId,
+        action: "cancel",
+      });
+      return;
+    }
+
+    // Direkt onaylama işlemi
+    await performStatusUpdate(appointmentId, newStatus);
+  };
+
+  // Gerçek status güncelleme işlemi
+  const performStatusUpdate = async (
+    appointmentId: string,
+    newStatus: "confirmed" | "cancelled"
+  ) => {
     setActionLoading(true);
     try {
       const { error } = await supabase
@@ -614,6 +820,21 @@ const AdminPanelPage = () => {
     }
   };
 
+  // Confirm dialog işlemleri
+  const handleConfirmAction = () => {
+    if (confirmDialog.action === "cancel") {
+      performStatusUpdate(confirmDialog.appointmentId, "cancelled");
+    }
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog({
+      isOpen: false,
+      appointmentId: "",
+      action: "",
+    });
+  };
+
   // Takvim için event'leri hazırla (filtrelenmiş)
   const calendarEvents = filteredAppointments.map((appointment) => ({
     id: appointment.id,
@@ -630,6 +851,7 @@ const AdminPanelPage = () => {
   // Event stilini belirleme
   const eventStyleGetter = (event: { resource: Appointment }) => {
     const appointment = event.resource;
+    const isPast = isPastAppointment(appointment);
     let backgroundColor = "#3b82f6"; // Mavi (pending)
 
     if (appointment.status === "confirmed") {
@@ -642,10 +864,11 @@ const AdminPanelPage = () => {
       style: {
         backgroundColor,
         borderRadius: "8px",
-        opacity: 0.9,
+        opacity: isPast ? 0.4 : 0.9, // Geçmiş randevuları soluk göster
         color: "white",
         border: "0px",
         display: "block",
+        textDecoration: isPast ? "line-through" : "none", // Geçmiş randevuları üstü çizgili göster
       },
     };
   };
@@ -706,7 +929,9 @@ const AdminPanelPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Psikolog Panel
+              </h1>
               <p className="text-gray-600">Randevu Yönetim Sistemi</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -921,10 +1146,38 @@ const AdminPanelPage = () => {
             transition={{ delay: 0.5 }}
           >
             {selectedAppointment ? (
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Randevu Detayları
-                </h3>
+              <div
+                className={`bg-white rounded-xl shadow-md p-6 ${
+                  isPastAppointment(selectedAppointment) ? "opacity-70" : ""
+                }`}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Randevu Detayları
+                  </h3>
+                  {selectedAppointment.status === "confirmed" &&
+                    !isPastAppointment(selectedAppointment) && (
+                      <Button
+                        onClick={() =>
+                          updateAppointmentStatus(
+                            selectedAppointment.id,
+                            "cancelled"
+                          )
+                        }
+                        disabled={actionLoading}
+                        className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1"
+                      >
+                        <FaTimes className="mr-1" />
+                        İptal Et
+                      </Button>
+                    )}
+                  {selectedAppointment.status === "confirmed" &&
+                    isPastAppointment(selectedAppointment) && (
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        Geçmiş Randevu
+                      </span>
+                    )}
+                </div>
 
                 <div className="space-y-4">
                   <div>
@@ -997,36 +1250,85 @@ const AdminPanelPage = () => {
                     </div>
                   )}
 
-                  {selectedAppointment.status === "pending" && (
-                    <div className="flex space-x-3 pt-4">
-                      <Button
-                        onClick={() =>
-                          updateAppointmentStatus(
-                            selectedAppointment.id,
-                            "confirmed"
-                          )
-                        }
-                        disabled={actionLoading}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <FaCheck className="mr-2" />
-                        Onayla
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          updateAppointmentStatus(
-                            selectedAppointment.id,
-                            "cancelled"
-                          )
-                        }
-                        disabled={actionLoading}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <FaTimes className="mr-2" />
-                        İptal Et
-                      </Button>
-                    </div>
-                  )}
+                  {selectedAppointment.status === "pending" &&
+                    !isPastAppointment(selectedAppointment) && (
+                      <div className="flex space-x-3 pt-4">
+                        <Button
+                          onClick={() =>
+                            updateAppointmentStatus(
+                              selectedAppointment.id,
+                              "confirmed"
+                            )
+                          }
+                          disabled={actionLoading}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <FaCheck className="mr-2" />
+                          Onayla
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            updateAppointmentStatus(
+                              selectedAppointment.id,
+                              "cancelled"
+                            )
+                          }
+                          disabled={actionLoading}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          <FaTimes className="mr-2" />
+                          İptal Et
+                        </Button>
+                      </div>
+                    )}
+
+                  {selectedAppointment.status === "pending" &&
+                    isPastAppointment(selectedAppointment) && (
+                      <div className="pt-4">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                          <p className="text-yellow-800 text-sm font-medium">
+                            ⚠️ Bu randevu geçmiş tarihte kalmıştır
+                          </p>
+                          <p className="text-yellow-700 text-xs mt-1">
+                            Geçmiş randevular için işlem yapılamaz
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                  {selectedAppointment.status === "cancelled" &&
+                    !isPastAppointment(selectedAppointment) && (
+                      <div className="flex space-x-3 pt-4">
+                        <Button
+                          onClick={() =>
+                            updateAppointmentStatus(
+                              selectedAppointment.id,
+                              "confirmed"
+                            )
+                          }
+                          disabled={actionLoading}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <FaCheck className="mr-2" />
+                          Tekrar Onayla
+                        </Button>
+                      </div>
+                    )}
+
+                  {selectedAppointment.status === "cancelled" &&
+                    isPastAppointment(selectedAppointment) && (
+                      <div className="pt-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <p className="text-gray-600 text-sm font-medium">
+                            📅 İptal edilmiş geçmiş randevu
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            Bu randevu geçmiş tarihte olduğu için tekrar
+                            onaylanamaz
+                          </p>
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
             ) : (
@@ -1075,6 +1377,18 @@ const AdminPanelPage = () => {
           }}
         />
       )}
+
+      {/* Modern Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={closeConfirmDialog}
+        onConfirm={handleConfirmAction}
+        title="Randevu İptali"
+        message="Bu randevuyu iptal etmek istediğinizden emin misiniz? Bu işlem geri alınabilir."
+        confirmText="İptal Et"
+        cancelText="Vazgeç"
+        type="danger"
+      />
     </div>
   );
 };

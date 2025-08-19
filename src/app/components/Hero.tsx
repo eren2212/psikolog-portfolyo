@@ -140,8 +140,8 @@ const Hero = () => {
                 transition={{ delay: 0.9 }}
               >
                 {[
-                  { number: "500+", label: "Mutlu Müşteri" },
-                  { number: "10+", label: "Yıl Deneyim" },
+                  { number: "150+", label: "Mutlu Müşteri" },
+                  { number: "2+", label: "Yıl Deneyim" },
                   { number: "98%", label: "Memnuniyet" },
                 ].map((stat, index) => (
                   <motion.div
@@ -150,7 +150,6 @@ const Hero = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1 + index * 0.1 }}
-                    whileHover={{ scale: 1.05 }}
                   >
                     <motion.div
                       className="text-2xl font-bold text-gray-900"
@@ -173,11 +172,7 @@ const Hero = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <motion.div
-                className="relative z-10"
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
+              <motion.div className="relative z-10">
                 <Image
                   src="/psikolog_images/erkek_uzman.jpg"
                   alt="Profesyonel Psikolog Desteği"
@@ -216,7 +211,7 @@ const Hero = () => {
 
               {/* Floating card */}
               <motion.div
-                className="absolute top-8 -left-8 bg-white rounded-xl shadow-xl p-4 z-20"
+                className="absolute top-8 -left-8 bg-white rounded-xl shadow-xl p-4 z-20 pointer-events-none"
                 initial={{ opacity: 0, y: 20, x: -20 }}
                 animate={{
                   opacity: 1,
@@ -232,17 +227,9 @@ const Hero = () => {
                     ease: "easeInOut",
                   },
                 }}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
-                }}
               >
                 <div className="flex items-center gap-3">
-                  <motion.div
-                    className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                  >
+                  <motion.div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <svg
                       className="w-6 h-6 text-green-600"
                       fill="none"
@@ -268,7 +255,7 @@ const Hero = () => {
 
               {/* Rating card */}
               <motion.div
-                className="absolute bottom-8 -right-8 bg-white rounded-xl shadow-xl p-4 z-20"
+                className="absolute bottom-8 -right-8 bg-white rounded-xl shadow-xl p-4 z-20 pointer-events-none"
                 initial={{ opacity: 0, y: 20, x: 20 }}
                 animate={{
                   opacity: 1,
@@ -284,10 +271,6 @@ const Hero = () => {
                     ease: "easeInOut",
                     delay: 1,
                   },
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 25px 50px rgba(0, 0, 0, 0.15)",
                 }}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -314,7 +297,7 @@ const Hero = () => {
                   </motion.div>
                   <span className="font-semibold text-gray-900">4.9</span>
                 </div>
-                <div className="text-sm text-gray-600">200+ Değerlendirme</div>
+                <div className="text-sm text-gray-600">100+ Değerlendirme</div>
               </motion.div>
             </motion.div>
           </div>

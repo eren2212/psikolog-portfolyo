@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Container from "../Container";
+import Link from "next/link";
 
 const Comment = () => {
   const testimonials = [
@@ -257,7 +258,7 @@ const Comment = () => {
             transition={{ duration: 0.5, delay: 1.6 }}
             viewport={{ once: true }}
           >
-            Bizimle İletişime Geçin
+            <Link href="/iletisim">Bizimle İletişime Geçin</Link>
           </motion.button>
         </motion.div>
       </Container>

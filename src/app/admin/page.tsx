@@ -88,7 +88,7 @@ const AdminLoginPage = () => {
             <FaLock className="text-white text-2xl" />
           </motion.div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Admin Paneli
+            Psikolog Paneli
           </h1>
           <p className="text-gray-600">Randevu yönetimi için giriş yapın</p>
         </div>
@@ -121,7 +121,7 @@ const AdminLoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                placeholder="admin@example.com"
+                placeholder="psikolog@psikolog.com"
               />
             </div>
           </div>
