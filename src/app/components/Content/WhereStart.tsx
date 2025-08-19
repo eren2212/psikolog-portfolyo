@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Container from "../Container";
+import Link from "next/link";
 
 const WhereStart = () => {
   const psychologyOptions = [
@@ -179,7 +180,7 @@ const WhereStart = () => {
             transition={{ duration: 0.5, delay: 1.6 }}
             viewport={{ once: true }}
           >
-            Hemen Başlayın
+            <Link href="/randevu-al">Hemen Başlayın</Link>
           </motion.button>
         </motion.div>
       </Container>
