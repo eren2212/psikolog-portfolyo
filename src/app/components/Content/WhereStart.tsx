@@ -100,9 +100,7 @@ const WhereStart = () => {
               }}
               viewport={{ once: true }}
               whileHover={{
-                scale: 1.03,
-                y: -5,
-                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
+                y: -2,
               }}
               whileTap={{ scale: 0.97 }}
             >
@@ -110,8 +108,6 @@ const WhereStart = () => {
                 <div className="flex items-center space-x-4">
                   <motion.div
                     className={`w-12 h-12 rounded-full ${option.color} flex items-center justify-center text-2xl`}
-                    whileHover={{ rotate: 10, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 300 }}
                   >
                     {option.emoji}
                   </motion.div>
@@ -136,11 +132,7 @@ const WhereStart = () => {
                     </motion.p>
                   </div>
                 </div>
-                <motion.div
-                  className="text-gray-400 group-hover:text-purple-500 transition-colors duration-200"
-                  whileHover={{ x: 5 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                >
+                <motion.div className="text-gray-400 group-hover:text-purple-500 transition-colors duration-200">
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -156,13 +148,6 @@ const WhereStart = () => {
                   </svg>
                 </motion.div>
               </div>
-
-              {/* Hover overlay effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 rounded-2xl"
-                whileHover={{ opacity: 0.05 }}
-                transition={{ duration: 0.3 }}
-              />
             </motion.div>
           ))}
         </div>

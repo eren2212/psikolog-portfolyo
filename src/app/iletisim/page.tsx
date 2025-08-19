@@ -540,25 +540,25 @@ export default function Iletisim() {
                 {
                   icon: "📧",
                   title: "E-posta",
-                  info: "info@psikolog.com",
+                  info: "fatihiridere@outlook.com",
                   color: "from-blue-500 to-blue-600",
                 },
                 {
                   icon: "📱",
                   title: "Telefon",
-                  info: "+90 532 123 45 67",
+                  info: "+90  537 028 58 93",
                   color: "from-green-500 to-green-600",
                 },
                 {
                   icon: "📍",
                   title: "Adres",
-                  info: "İstanbul, Türkiye",
+                  info: "Bozüyük /Bilecik ",
                   color: "from-purple-500 to-purple-600",
                 },
                 {
                   icon: "🕒",
                   title: "Çalışma Saatleri",
-                  info: "Pzt-Cum: 09:00-18:00",
+                  info: "Pzt-Cum: 09:00-17:00",
                   color: "from-orange-500 to-orange-600",
                 },
               ].map((item, index) => (
