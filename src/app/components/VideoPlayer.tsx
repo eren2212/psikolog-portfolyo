@@ -67,7 +67,7 @@ const VideoPlayer = () => {
         </div>
       )}
       <Video
-        src={tanitim as any}
+        src={tanitim}
         className="w-full rounded-lg shadow-lg"
         controls
         autoPlay={false}

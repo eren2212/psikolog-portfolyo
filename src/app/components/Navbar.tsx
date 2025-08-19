@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Button from "./Button";
+
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { motion } from "framer-motion";

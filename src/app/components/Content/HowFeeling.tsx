@@ -96,7 +96,7 @@ const HowFeeling = () => {
             });
           }
         }
-      } catch (error) {
+      } catch {
         // Handle animation errors gracefully
         console.log("Breathing animation stopped");
       }

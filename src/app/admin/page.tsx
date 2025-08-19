@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Button from "../components/Button";
-import { signIn, getCurrentUser, supabase } from "@/lib/supabase";
+import { signIn, getCurrentUser } from "@/lib/supabase";
 import { FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const AdminLoginPage = () => {
@@ -16,12 +16,7 @@ const AdminLoginPage = () => {
 
   const router = useRouter();
 
-  // Sayfa yüklendiğinde kullanıcı giriş yapmış mı kontrol et
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const { user } = await getCurrentUser();
       if (user) {
@@ -33,7 +28,12 @@ const AdminLoginPage = () => {
     } finally {
       setIsCheckingAuth(false);
     }
-  };
+  }, [router]);
+
+  // Sayfa yüklendiğinde kullanıcı giriş yapmış mı kontrol et
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
