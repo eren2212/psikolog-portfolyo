@@ -10,6 +10,7 @@ import {
   FaComments,
   FaHandHoldingHeart,
 } from "react-icons/fa";
+import Link from "next/link";
 
 const AileCiftTerapisiPage = () => {
   const benefits = [
@@ -103,7 +104,7 @@ const AileCiftTerapisiPage = () => {
                 transition={{ duration: 0.8, delay: 0.3 }}
               >
                 <Button className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 text-lg">
-                  Hemen Randevu Al
+                  <Link href="/randevu-al">Hemen Randevu Al</Link>
                 </Button>
               </motion.div>
             </motion.div>
@@ -316,10 +317,7 @@ const AileCiftTerapisiPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-white text-pink-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold">
-              Randevu Al
-            </Button>
-            <Button className="border-2 border-white text-white hover:bg-white hover:text-pink-600 px-8 py-4 text-lg font-semibold">
-              Daha Fazla Bilgi
+              <Link href="/randevu-al">Randevu Al</Link>
             </Button>
           </div>
         </motion.section>

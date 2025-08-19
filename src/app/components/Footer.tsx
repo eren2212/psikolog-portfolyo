@@ -6,12 +6,13 @@ import { FaInstagram } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
+import Link from "next/link";
 
 const Footer = () => {
   const quickLinks = [
     { name: "Anasayfa", href: "#" },
-    { name: "Online Terapisi", href: "#" },
-    { name: "Çift Terapisi", href: "#" },
+    { name: "Online Terapisi", href: "/online-terapi" },
+    { name: "Çift Terapisi", href: "/aile-cift-terapisi" },
   ];
 
   const blogLinks = [
@@ -21,8 +22,8 @@ const Footer = () => {
   ];
 
   const contactLinks = [
-    { name: "İletişim", href: "#" },
-    { name: "Randevu Al", href: "#" },
+    { name: "İletişim", href: "/iletisim" },
+    { name: "Randevu Al", href: "/randevu-al" },
   ];
 
   const socialLinks = [
@@ -77,7 +78,7 @@ const Footer = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  Randevu Al
+                  <Link href="/randevu-al">Randevu Al</Link>
                 </motion.button>
                 <motion.button
                   className="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200"

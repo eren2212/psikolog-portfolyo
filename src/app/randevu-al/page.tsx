@@ -622,8 +622,8 @@ const RandevuAlPage = () => {
                 Onay Bekleyin
               </h4>
               <p className="text-blue-700 text-sm">
-                Randevu talebiniz incelendikten sonra size e-posta ile
-                bilgilendirme yapılacaktır.
+                Randevu talebiniz incelendikten sonra sizi arayacağız ve
+                bilgilendireceğiz.
               </p>
             </div>
             <div className="text-center">
@@ -635,7 +635,7 @@ const RandevuAlPage = () => {
               </h4>
               <p className="text-blue-700 text-sm">
                 Onaylanan randevu saatinde belirlenen yerde buluşarak seansınızı
-                gerçekleştirin.
+                gerçekleştirin.Veya online terapi yapabilirsiniz.
               </p>
             </div>
           </div>

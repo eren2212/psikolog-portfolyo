@@ -13,6 +13,7 @@ import {
   FaWifi,
   FaHeadset,
 } from "react-icons/fa";
+import Link from "next/link";
 
 const OnlineTerapiPage = () => {
   const benefits = [
@@ -129,7 +130,7 @@ const OnlineTerapiPage = () => {
                 transition={{ duration: 0.8, delay: 0.3 }}
               >
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
-                  Online Randevu Al
+                  <Link href="/randevu-al">Online Randevu Al</Link>
                 </Button>
               </motion.div>
             </motion.div>
@@ -319,9 +320,6 @@ const OnlineTerapiPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold">
               Ücretsiz Ön Görüşme
-            </Button>
-            <Button className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold">
-              Teknik Destek Al
             </Button>
           </div>
         </motion.section>

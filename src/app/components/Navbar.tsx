@@ -103,7 +103,7 @@ const Navbar = () => {
               </Link>
               <Link href="/randevu-al">
                 <Button fullWidth className="cursor-pointer">
-                  Randevu Al
+                  <Link href="/randevu-al">Randevu Al</Link>
                 </Button>
               </Link>
             </div>

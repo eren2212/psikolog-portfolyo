@@ -10,6 +10,7 @@ import {
   FaBrain,
   FaCalendarCheck,
 } from "react-icons/fa";
+import Link from "next/link";
 
 const BireyselPage = () => {
   const benefits = [
@@ -103,7 +104,7 @@ const BireyselPage = () => {
                 transition={{ duration: 0.8, delay: 0.3 }}
               >
                 <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg">
-                  Hemen Randevu Al
+                  <Link href="/randevu-al">Hemen Randevu Al</Link>
                 </Button>
               </motion.div>
             </motion.div>
@@ -247,10 +248,7 @@ const BireyselPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold">
-              Randevu Al
-            </Button>
-            <Button className="border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 text-lg font-semibold">
-              Daha Fazla Bilgi
+              <Link href="/randevu-al">Randevu Al</Link>
             </Button>
           </div>
         </motion.section>
