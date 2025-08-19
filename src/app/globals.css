@@ -58,3 +58,62 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* React Big Calendar Styles */
+.rbc-toolbar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1rem !important;
+  padding: 0.5rem !important;
+}
+
+.rbc-toolbar button {
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0.25rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.rbc-toolbar button:hover {
+  background: #e5e7eb !important;
+  border-color: #9ca3af !important;
+}
+
+.rbc-toolbar button.rbc-active {
+  background: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: white !important;
+}
+
+.rbc-toolbar-label {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  margin: 0 1rem !important;
+}
+
+.rbc-btn-group {
+  display: flex !important;
+  gap: 0.25rem !important;
+}
+
+.rbc-btn-group button:first-child {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.rbc-btn-group button:last-child {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.rbc-btn-group button:not(:first-child):not(:last-child) {
+  border-radius: 0 !important;
+}

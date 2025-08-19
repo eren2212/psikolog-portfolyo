@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "./components/Toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,8 +17,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Psikolog Portfolyo",
-  description: "Modern ve profesyonel psikolog portfolyo sitesi",
+  title: "PSK Fatih İridere",
+  description: "PSK Fatih İridere",
 };
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

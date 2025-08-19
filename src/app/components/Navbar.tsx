@@ -15,15 +15,17 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Image
-                src="/psikolog_images/logo.png"
-                alt="logo"
-                width={150}
-                height={150}
-                className="py-2"
-              />
-            </div>
+            <Link href="/">
+              <div className="flex-shrink-0">
+                <Image
+                  src="/psikolog_images/logo.png"
+                  alt="logo"
+                  width={150}
+                  height={150}
+                  className="py-2"
+                />
+              </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -47,7 +49,9 @@ const Navbar = () => {
               >
                 İletişim
               </Link>
-              <Button>Randevu Al</Button>
+              <Link href="/randevu-al">
+                <Button className="cursor-pointer">Randevu Al</Button>
+              </Link>
             </div>
           </div>
 
@@ -97,9 +101,11 @@ const Navbar = () => {
               >
                 İletişim
               </Link>
-              <Button fullWidth>
-                <a href="/randevu-al">Randevu Al</a>
-              </Button>
+              <Link href="/randevu-al">
+                <Button fullWidth className="cursor-pointer">
+                  Randevu Al
+                </Button>
+              </Link>
             </div>
           </motion.div>
         )}
