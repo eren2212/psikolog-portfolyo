@@ -385,7 +385,7 @@ const RandevuAlPage = () => {
                 <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
                   <p className="text-sm text-blue-700">
                     📱 <strong>Mobil İpucu:</strong> Takvimden istediğiniz
-                    tarihe dokunarak randevu alabilirsiniz.
+                    tarihe biraz uzun basarak randevu alabilirsiniz.
                   </p>
                 </div>
               )}
