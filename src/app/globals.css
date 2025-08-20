@@ -117,3 +117,89 @@ html {
 .rbc-btn-group button:not(:first-child):not(:last-child) {
   border-radius: 0 !important;
 }
+
+/* Mobil Takvim Optimizasyonları */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .rbc-toolbar-label {
+    font-size: 1.1rem !important;
+    margin: 0.5rem 0 !important;
+  }
+
+  .rbc-btn-group {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  .rbc-toolbar button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    min-height: 44px !important; /* Apple'ın önerdiği minimum dokunmatik alan */
+    min-width: 44px !important;
+  }
+
+  .rbc-month-view {
+    font-size: 0.85rem !important;
+  }
+
+  .rbc-date-cell {
+    padding: 0.5rem !important;
+    min-height: 44px !important; /* Dokunmatik alan */
+  }
+
+  .rbc-day-bg {
+    min-height: 44px !important;
+  }
+
+  .rbc-header {
+    padding: 0.75rem 0.25rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* Takvim hücreleri için dokunmatik optimizasyon */
+.rbc-day-bg {
+  cursor: pointer !important;
+  transition: background-color 0.2s !important;
+}
+
+.rbc-day-bg:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb !important;
+  color: #9ca3af !important;
+}
+
+.rbc-today {
+  background-color: #fef3c7 !important;
+}
+
+.rbc-selected {
+  background-color: #e0e7ff !important;
+}
+
+/* Event stilleri */
+.rbc-event {
+  border-radius: 4px !important;
+  border: none !important;
+  font-size: 0.8rem !important;
+  padding: 2px 4px !important;
+}
+
+/* Mobil için dokunmatik alanları genişlet */
+.touch-manipulation {
+  touch-action: manipulation !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}

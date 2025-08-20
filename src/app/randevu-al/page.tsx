@@ -1,16 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Container from "../components/Container";
 import Button from "../components/Button";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
+import "moment/locale/tr"; // Türkçe locale'i açıkça import et
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { supabase, Appointment, BlockedPeriod } from "@/lib/supabase";
 import { FaCalendarAlt, FaClock, FaUser } from "react-icons/fa";
 import { useToast } from "../components/Toast";
 
-// Moment.js yerelleştirme
+// Moment.js yerelleştirme - Production için güçlendirilmiş
 moment.locale("tr");
 const localizer = momentLocalizer(moment);
 
@@ -28,6 +29,13 @@ const RandevuAlPage = () => {
     "month" | "week" | "day" | "agenda" | "work_week"
   >("month");
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
+
+  // Türkçe tarih formatları için memoized localizer
+  const turkishLocalizer = useMemo(() => {
+    // Production'da locale'in kesin yüklendiğinden emin ol
+    moment.locale("tr");
+    return momentLocalizer(moment);
+  }, []);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -94,8 +102,11 @@ const RandevuAlPage = () => {
     "16:00-17:00",
   ];
 
-  // Randevuları ve bloke dönemleri yükle
+  // Locale'i kesin ayarla ve verileri yükle
   useEffect(() => {
+    // Production'da locale ayarını kesinleştir
+    moment.locale("tr");
+
     fetchAppointments();
     fetchBlockedPeriods();
   }, []);
@@ -343,13 +354,13 @@ const RandevuAlPage = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Takvim */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 order-1"
           >
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -357,7 +368,13 @@ const RandevuAlPage = () => {
                 Tarih Seçin
               </h2>
 
-              <div className="calendar-container" style={{ height: "500px" }}>
+              <div
+                className="calendar-container touch-manipulation"
+                style={{
+                  height: "500px",
+                  touchAction: "manipulation", // Mobil dokunmatik optimizasyonu
+                }}
+              >
                 {calendarLoading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
@@ -367,7 +384,7 @@ const RandevuAlPage = () => {
                   </div>
                 ) : (
                   <Calendar
-                    localizer={localizer}
+                    localizer={turkishLocalizer}
                     events={calendarEvents}
                     startAccessor="start"
                     endAccessor="end"
@@ -381,6 +398,13 @@ const RandevuAlPage = () => {
                     date={currentDate}
                     onNavigate={(date) => setCurrentDate(date)}
                     toolbar={true}
+                    // Mobil dokunmatik destek
+                    longPressThreshold={100}
+                    onSelectEvent={(event) => {
+                      // Event'e tıklandığında hiçbir şey yapma (sadece tarih seçimine izin ver)
+                      return;
+                    }}
+                    // Türkçe mesajlar
                     messages={{
                       next: "Sonraki",
                       previous: "Önceki",
@@ -388,7 +412,57 @@ const RandevuAlPage = () => {
                       month: "Ay",
                       week: "Hafta",
                       day: "Gün",
+                      agenda: "Ajanda",
+                      date: "Tarih",
+                      time: "Saat",
+                      event: "Etkinlik",
+                      noEventsInRange:
+                        "Bu tarih aralığında etkinlik bulunmuyor.",
+                      showMore: (total: number) => `+${total} tane daha`,
                     }}
+                    // Mobil için daha iyi dokunmatik deneyim
+                    step={60}
+                    timeslots={1}
+                    formats={{
+                      dateFormat: "DD",
+                      dayFormat: (
+                        date: Date,
+                        culture?: string,
+                        localizer?: any
+                      ) => localizer?.format(date, "dddd", culture),
+                      dayHeaderFormat: (
+                        date: Date,
+                        culture?: string,
+                        localizer?: any
+                      ) => localizer?.format(date, "dddd DD/MM", culture),
+                      dayRangeHeaderFormat: (
+                        { start, end }: { start: Date; end: Date },
+                        culture?: string,
+                        localizer?: any
+                      ) =>
+                        `${localizer?.format(
+                          start,
+                          "DD MMMM",
+                          culture
+                        )} - ${localizer?.format(
+                          end,
+                          "DD MMMM YYYY",
+                          culture
+                        )}`,
+                      monthHeaderFormat: (
+                        date: Date,
+                        culture?: string,
+                        localizer?: any
+                      ) => localizer?.format(date, "MMMM YYYY", culture),
+                      weekdayFormat: (
+                        date: Date,
+                        culture?: string,
+                        localizer?: any
+                      ) => localizer?.format(date, "dd", culture),
+                    }}
+                    // Mobil responsive ayarlar
+                    popup
+                    popupOffset={10}
                   />
                 )}
               </div>
@@ -416,7 +490,7 @@ const RandevuAlPage = () => {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="space-y-6"
+            className="space-y-6 order-2"
           >
             {/* Tarih Seçimi */}
             {selectedDate && (
@@ -427,7 +501,9 @@ const RandevuAlPage = () => {
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Seçilen Tarih:{" "}
-                  <strong>{moment(selectedDate).format("DD MMMM YYYY")}</strong>
+                  <strong>
+                    {moment(selectedDate).locale("tr").format("DD MMMM YYYY")}
+                  </strong>
                 </p>
 
                 <div className="grid grid-cols-1 gap-2">
