@@ -93,7 +93,7 @@ const Navbar = () => {
                 Anasayfa
               </Link>
               <Link
-                href="#"
+                href="/hakkimda"
                 className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium transition-colors duration-200 ease-in-out"
               >
                 Hakkımda
