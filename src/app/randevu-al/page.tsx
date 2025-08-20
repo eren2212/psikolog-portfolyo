@@ -13,7 +13,6 @@ import { useToast } from "../components/Toast";
 
 // Moment.js yerelleştirme - Production için güçlendirilmiş
 moment.locale("tr");
-const localizer = momentLocalizer(moment);
 
 const RandevuAlPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -400,7 +399,7 @@ const RandevuAlPage = () => {
                     toolbar={true}
                     // Mobil dokunmatik destek
                     longPressThreshold={100}
-                    onSelectEvent={(event) => {
+                    onSelectEvent={() => {
                       // Event'e tıklandığında hiçbir şey yapma (sadece tarih seçimine izin ver)
                       return;
                     }}
@@ -425,40 +424,22 @@ const RandevuAlPage = () => {
                     timeslots={1}
                     formats={{
                       dateFormat: "DD",
-                      dayFormat: (
-                        date: Date,
-                        culture?: string,
-                        localizer?: any
-                      ) => localizer?.format(date, "dddd", culture),
-                      dayHeaderFormat: (
-                        date: Date,
-                        culture?: string,
-                        localizer?: any
-                      ) => localizer?.format(date, "dddd DD/MM", culture),
-                      dayRangeHeaderFormat: (
-                        { start, end }: { start: Date; end: Date },
-                        culture?: string,
-                        localizer?: any
-                      ) =>
-                        `${localizer?.format(
-                          start,
-                          "DD MMMM",
-                          culture
-                        )} - ${localizer?.format(
-                          end,
-                          "DD MMMM YYYY",
-                          culture
-                        )}`,
-                      monthHeaderFormat: (
-                        date: Date,
-                        culture?: string,
-                        localizer?: any
-                      ) => localizer?.format(date, "MMMM YYYY", culture),
-                      weekdayFormat: (
-                        date: Date,
-                        culture?: string,
-                        localizer?: any
-                      ) => localizer?.format(date, "dd", culture),
+                      dayFormat: (date: Date) => moment(date).format("dddd"),
+                      dayHeaderFormat: (date: Date) =>
+                        moment(date).format("dddd DD/MM"),
+                      dayRangeHeaderFormat: ({
+                        start,
+                        end,
+                      }: {
+                        start: Date;
+                        end: Date;
+                      }) =>
+                        `${moment(start).format("DD MMMM")} - ${moment(
+                          end
+                        ).format("DD MMMM YYYY")}`,
+                      monthHeaderFormat: (date: Date) =>
+                        moment(date).format("MMMM YYYY"),
+                      weekdayFormat: (date: Date) => moment(date).format("dd"),
                     }}
                     // Mobil responsive ayarlar
                     popup

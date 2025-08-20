@@ -19,11 +19,8 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["moment"],
   },
 
-  // Türkçe locale desteği
-  i18n: {
-    locales: ["tr"],
-    defaultLocale: "tr",
-  },
+  // App Router ile i18n uyumsuz olduğu için kaldırıldı
+  // Türkçe desteği moment.js ile sağlanıyor
 };
 
 export default nextConfig;
