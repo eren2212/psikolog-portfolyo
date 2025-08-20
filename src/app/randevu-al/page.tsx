@@ -27,6 +27,20 @@ const RandevuAlPage = () => {
   const [currentView, setCurrentView] = useState<
     "month" | "week" | "day" | "agenda" | "work_week"
   >("month");
+
+  // Mobil cihaz tespiti
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
 
   // Türkçe tarih formatları için memoized localizer
@@ -367,6 +381,15 @@ const RandevuAlPage = () => {
                 Tarih Seçin
               </h2>
 
+              {isMobile && (
+                <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                  <p className="text-sm text-blue-700">
+                    📱 <strong>Mobil İpucu:</strong> Takvimden istediğiniz
+                    tarihe dokunarak randevu alabilirsiniz.
+                  </p>
+                </div>
+              )}
+
               <div
                 className="calendar-container touch-manipulation"
                 style={{
@@ -391,9 +414,14 @@ const RandevuAlPage = () => {
                     onSelectSlot={handleSelectSlot}
                     selectable
                     eventPropGetter={eventStyleGetter}
-                    views={["month", "week", "day"]}
-                    view={currentView}
-                    onView={(view) => setCurrentView(view)}
+                    views={isMobile ? ["month"] : ["month", "week", "day"]}
+                    view={isMobile ? "month" : currentView}
+                    onView={(view) => {
+                      // Mobilde sadece month view'a izin ver
+                      if (!isMobile) {
+                        setCurrentView(view);
+                      }
+                    }}
                     date={currentDate}
                     onNavigate={(date) => setCurrentDate(date)}
                     toolbar={true}
@@ -444,6 +472,10 @@ const RandevuAlPage = () => {
                     // Mobil responsive ayarlar
                     popup
                     popupOffset={10}
+                    // Mobilde drill-down davranışını engelle
+                    drilldownView={isMobile ? null : "day"}
+                    // Mobilde event tıklamalarını engelle
+                    onDrillDown={isMobile ? () => false : undefined}
                   />
                 )}
               </div>
