@@ -9,7 +9,7 @@ import {
   supabase,
   signOut,
   getCurrentUser,
-  Appointment,
+  Appointment, 
   BlockedPeriod,
 } from "@/lib/supabase";
 import Button from "../../components/Button";
